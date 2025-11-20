@@ -9,7 +9,7 @@ CREATE TABLE "webhooks" (
     "contentLength" INTEGER,
     "queryParams" JSONB,
     "headers" JSONB NOT NULL,
-    "body" TEXT NOT NULL,
+    "body" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "webhooks_pkey" PRIMARY KEY ("id")

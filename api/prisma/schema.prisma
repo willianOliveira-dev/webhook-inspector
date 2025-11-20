@@ -14,7 +14,7 @@ datasource db {
 }
 
 model webhooks {
-  id            String      @id
+  id            String      @id 
   method        String
   pathname      String
   ip            String
@@ -23,6 +23,6 @@ model webhooks {
   contentLength Int?
   queryParams   Json?
   headers       Json
-  body          String
+  body          String?
   createdAt     DateTime @default(now())
 }

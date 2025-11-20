@@ -1,0 +1,24 @@
+@import 'tailwindcss';
+
+@theme {
+    --default-font-family: Geist, sans-serif;
+    --font-mono: JetBrains Mono;
+    /* Custom white palette - pure white and subtle light backgrounds with dark text */
+    --color-white-50: #ffffff; /* Main background - Pure White */
+    --color-white-100: #f7f7f7; /* Sidebar background - Very Light Gray */
+    --color-white-200: #f0f0f0; /* Card/elevated background - Light Gray */
+    --color-white-300: #e5e5e5; /* Borders - Slightly Darker Gray */
+    --color-white-400: #cccccc; /* Hover states - Medium Gray */
+    --color-white-500: #999999; /* Active/interactive - Deeper Gray */
+    --color-white-600: #666666; /* Muted text - Dark Gray */
+    --color-white-700: #444444; /* Secondary text - Darker Gray */
+    --color-white-800: #222222; /* Primary text - Very Dark Gray */
+    --color-white-900: #111111; /* Bright text - Near Black */
+    --color-white-950: #000000; /* Brightest highlights - Pure Black */
+}
+
+@layer base {
+    body {
+        @apply bg-zinc-950 text-zinc-100 antialiased;
+    }
+}

@@ -1,33 +1,38 @@
 {
-  "name": "api",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "dev": "tsx watch --env-file=.env  ./src/server.ts",
-    "start": "node dist/server.js",
-    "format": "biome format --write"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.19.0",
-  "devDependencies": {
-    "@biomejs/biome": "2.3.1",
-    "@types/node": "^24.9.1",
-    "tsx": "^4.20.6",
-    "typescript": "~5.9.3"
-  },
-  "dependencies": {
-    "@fastify/cors": "^11.1.0",
-    "@fastify/swagger": "^9.5.2",
-    "@prisma/client": "6.18.0",
-    "@scalar/fastify-api-reference": "^1.38.1",
-    "dotenv": "^17.2.3",
-    "fastify": "^5.6.1",
-    "fastify-type-provider-zod": "^6.1.0",
-    "prisma": "^6.18.0",
-    "uuidv7": "^1.0.2",
-    "zod": "^4.1.12"
-  }
+    "name": "api",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "dev": "tsx watch --env-file=.env  ./src/server.ts",
+        "start": "node dist/server.js",
+        "format": "biome format --write",
+        "db:seed": "tsx --env-file=.env ./prisma/seed.ts"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "packageManager": "pnpm@10.19.0",
+    "devDependencies": {
+        "@biomejs/biome": "2.3.1",
+        "@types/node": "^24.9.1",
+        "tsx": "^4.20.6",
+        "typescript": "~5.9.3"
+    },
+    "dependencies": {
+        "@ai-sdk/google": "^2.0.39",
+        "@faker-js/faker": "^10.1.0",
+        "@fastify/cors": "^11.1.0",
+        "@fastify/swagger": "^9.5.2",
+        "@prisma/client": "6.18.0",
+        "@scalar/fastify-api-reference": "^1.38.1",
+        "ai": "^5.0.95",
+        "dotenv": "^17.2.3",
+        "fastify": "^5.6.1",
+        "fastify-plugin": "^5.1.0",
+        "fastify-type-provider-zod": "^6.1.0",
+        "prisma": "^6.18.0",
+        "uuidv7": "^1.0.2",
+        "zod": "^4.1.12"
+    }
 }
