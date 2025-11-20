@@ -12,8 +12,6 @@ export function WebhookList() {
     const loadMoreRef = useRef<HTMLDivElement>(null);
     const observerRef = useRef<IntersectionObserver>(null);
 
-    const [loaderGeneratedCode, setLoaderGeneratedCode] =
-        useState<boolean>(false);
     const [checkedWebhookIds, setCheckedWebhookIds] = useState<string[]>([]);
     const [generatedHandlerCode, setGeneratedHandlerCode] = useState<
         string | null
