@@ -2,7 +2,27 @@ import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { generateText } from 'ai';
 import { z } from 'zod';
 import { prompt } from '../helpers/prompt';
-import { google } from '@ai-sdk/google';
+import { groq } from '@ai-sdk/groq';
+
+const generatedHandlerSchema = z.object({
+    code: z.string().min(1),
+});
+
+function removeMarkdownCodeFence(code: string) {
+    const trimmedCode = code.trim();
+    const fencedCodeMatch = trimmedCode.match(
+        /^```(?:typescript|ts)?\s*([\s\S]*?)\s*```$/i
+    );
+
+    if (fencedCodeMatch) {
+        return fencedCodeMatch[1].trim();
+    }
+
+    return trimmedCode
+        .replace(/^```(?:typescript|ts)?\s*/i, '')
+        .replace(/\s*```$/i, '')
+        .trim();
+}
 
 export const generateWebhook: FastifyPluginAsyncZod = async (app) => {
     app.post(
@@ -12,12 +32,10 @@ export const generateWebhook: FastifyPluginAsyncZod = async (app) => {
                 summary: 'Gera um TypeScript handler',
                 tags: ['Webhooks'],
                 body: z.object({
-                    webhookIds: z.array(z.string()),
+                    webhookIds: z.array(z.uuidv7()).min(1).max(20),
                 }),
                 response: {
-                    201: z.object({
-                        code: z.string(),
-                    }),
+                    201: generatedHandlerSchema,
                 },
             },
         },
@@ -40,11 +58,13 @@ export const generateWebhook: FastifyPluginAsyncZod = async (app) => {
                 .join('\n\n');
 
             const { text } = await generateText({
-                model: google('gemini-2.5-flash'),
+                model: groq('llama-3.3-70b-versatile'),
                 prompt: prompt(webhookBodies),
             });
 
-            return reply.status(201).send({ code: text });
-        }
+            return reply.status(201).send({
+                code: removeMarkdownCodeFence(text),
+            });
+        },
     );
 };

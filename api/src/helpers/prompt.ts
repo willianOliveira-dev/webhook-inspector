@@ -1,49 +1,47 @@
 export const prompt = (webhookExamples: string) =>
     `
-Você é um especialista em TypeScript e arquitetura de webhooks. Sua tarefa é analisar exemplos de payloads de webhooks e gerar um handler completo e tipado.
+Voce e um especialista em TypeScript e arquitetura de webhooks.
+Sua tarefa e analisar exemplos de payloads de webhooks e gerar um handler completo e tipado.
 
 ## Entrada
-Vou fornecer exemplos de requisições de webhooks no formato:
+Vou fornecer exemplos de requisicoes de webhooks no formato:
 WEBHOOK: [nome do evento]
 { "campo1": "valor", "campo2": 123 }
 
-## Sua Tarefa
-Gere um código TypeScript completo que inclua:
+## Sua tarefa
+Gere um codigo TypeScript completo que inclua:
 
-1. **Schemas Zod**: Crie schemas de validação para cada tipo de evento de webhook
-2. **Types TypeScript**: Extraia os tipos a partir dos schemas Zod
-3. **Função Handler**: Crie uma função principal que:
-   - Recebe o payload do webhook
-   - Identifica o tipo de evento
-   - Valida o payload com Zod
-   - Delega para handlers específicos de cada evento
-   - Trata erros de validação adequadamente
-4. **Handlers Específicos**: Crie funções separadas para processar cada tipo de evento
-5. **Tipagem Forte**: Use tipos discriminados (discriminated unions) para garantir type-safety
+1. Schemas Zod para cada tipo de evento de webhook.
+2. Types TypeScript extraidos dos schemas Zod.
+3. Uma funcao principal handleWebhook que:
+   - Recebe o payload bruto do webhook.
+   - Identifica o tipo de evento.
+   - Valida o payload com Zod.
+   - Delega para handlers especificos.
+   - Trata erros de validacao.
+4. Handlers especificos para processar cada evento.
+5. Tipagem forte com discriminated unions quando possivel.
 
-## Requisitos de Código
-- Use Zod para validação de schema
-- Use TypeScript strict mode
-- Inclua tratamento de erros robusto
-- Use async/await quando apropriado
-- Siga boas práticas de clean code
-- Estruture o código de forma modular e escalável
-- Adicione apenas comentários essenciais (evite poluição visual excessiva)
+## Requisitos de codigo
+- Use Zod para validacao de schema.
+- Use TypeScript strict mode.
+- Inclua tratamento de erros robusto.
+- Use async/await quando apropriado.
+- Siga boas praticas de clean code.
+- Estruture o codigo de forma modular e escalavel.
+- Adicione apenas comentarios essenciais.
 
-## Estrutura Esperada do Código
-
-O código deve seguir esta estrutura (adaptada aos eventos fornecidos):
+## Estrutura esperada
+O codigo deve seguir esta estrutura, adaptada aos eventos fornecidos:
 
 import { z } from 'zod';
 
 export const EventoASchema = z.object({
   event: z.literal('evento_a'),
-  // campos específicos
 });
 
 export const EventoBSchema = z.object({
   event: z.literal('evento_b'),
-  // campos específicos
 });
 
 export const WebhookPayloadSchema = z.discriminatedUnion('event', [
@@ -57,12 +55,10 @@ export type WebhookPayload = z.infer<typeof WebhookPayloadSchema>;
 
 async function handleEventoA(payload: EventoA): Promise<void> {
   console.log('Processando evento A:', payload);
-  // Lógica específica
 }
 
 async function handleEventoB(payload: EventoB): Promise<void> {
   console.log('Processando evento B:', payload);
-  // Lógica específica
 }
 
 export async function handleWebhook(rawPayload: unknown): Promise<{
@@ -71,7 +67,7 @@ export async function handleWebhook(rawPayload: unknown): Promise<{
 }> {
   try {
     const payload = WebhookPayloadSchema.parse(rawPayload);
-    
+
     switch (payload.event) {
       case 'evento_a':
         await handleEventoA(payload);
@@ -83,41 +79,49 @@ export async function handleWebhook(rawPayload: unknown): Promise<{
         const _exhaustive: never = payload;
         throw new Error('Evento desconhecido');
     }
-    
+
     return { success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        error: 'Validação falhou: ' + error.errors.map(e => e.message).join(', ')
+        error: 'Validacao falhou: ' + error.errors.map((e) => e.message).join(', '),
       };
     }
+
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Erro desconhecido'
+      error: error instanceof Error ? error.message : 'Erro desconhecido',
     };
   }
 }
 
-## Considerações Importantes
-- Se um campo puder ser null ou undefined, use .nullable() ou .optional()
-- Para arrays, use z.array()
-- Para enums, use z.enum() ou z.literal()
-- Para datas, use z.string().datetime() ou z.coerce.date()
-- Para objetos aninhados, crie schemas separados e reutilize
-- Adicione validações customizadas quando necessário (.email(), .url(), .min(), .max())
+## Consideracoes importantes
+- Se um campo puder ser null ou undefined, use .nullable() ou .optional().
+- Para arrays, use z.array().
+- Para enums, use z.enum() ou z.literal().
+- Para datas, use z.string().datetime() ou z.coerce.date().
+- Para objetos aninhados, crie schemas separados e reutilize.
+- Adicione validacoes customizadas quando necessario.
 
-## Exemplos de Webhooks
+## Exemplos de webhooks
 ${webhookExamples}
 
-## IMPORTANTE - Formato de Resposta
-RETORNE APENAS O CÓDIGO TYPESCRIPT PURO, SEM:
-- Blocos de código markdown (\`\`\`typescript ou \`\`\`)
-- Explicações antes ou depois do código
-- Texto adicional ou comentários fora do código
-- Qualquer formatação markdown
+## Regra obrigatoria de resposta
+RETORNE APENAS O CODIGO TYPESCRIPT PURO.
+NUNCA use Markdown.
+NUNCA use bloco de codigo.
+NUNCA comece com tres crases.
+NUNCA termine com tres crases.
+NUNCA retorne \`\`\`typescript.
+NUNCA retorne \`\`\`ts.
+NUNCA inclua explicacoes antes ou depois do codigo.
+NUNCA inclua texto fora do codigo.
 
-O código será usado diretamente em um processador (codeToHtml), portanto deve ser TypeScript válido e pronto para uso, começando com "import" e terminando com a última chave de fechamento.
+A primeira linha da resposta deve ser um import TypeScript, exatamente neste estilo:
+import { z } from 'zod';
 
-Gere agora o código TypeScript completo.
+O codigo sera usado diretamente em codeToHtml, entao deve ser TypeScript valido e pronto para uso, comecando com import e terminando na ultima chave de fechamento.
+
+Gere agora somente o codigo TypeScript.
 `.trim();

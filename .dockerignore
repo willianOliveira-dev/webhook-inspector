@@ -1,0 +1,16 @@
+.git
+.gitignore
+.env
+**/.env
+**/.env.*
+node_modules
+**/node_modules
+api/dist
+web/dist
+dist
+*.log
+*.local
+.DS_Store
+coverage
+.turbo
+.vercel

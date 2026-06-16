@@ -4,6 +4,11 @@ import { WebhookList } from '../ui/webookList';
 import { Suspense } from 'react';
 
 export function Sidebar() {
+    const captureUrl =
+        typeof window === 'undefined'
+            ? '/capture'
+            : `${window.location.origin}/capture`;
+
     return (
         <aside className="flex h-screen flex-col bg-white-100">
             <div className="flex items-center justify-between border-b border-white-300 px-4 py-5">
@@ -18,7 +23,7 @@ export function Sidebar() {
             <div className="flex items-center gap-2 border-b border-white-300 bg-white-200 px-4 py-2.5">
                 <div className="flex-1 min-w-0 flex items-center justify-between gap-1 text-xs font-mono text-white-700">
                     <span className="truncate">
-                        http://localhost:3333/api/capture
+                        {captureUrl}
                     </span>
 
                     <IconButton

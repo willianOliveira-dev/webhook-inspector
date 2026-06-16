@@ -1,12 +1,28 @@
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { WebhookListItem } from './webhook-list-item';
 import { webhookListSchema } from '../../http/schemas/webhooks';
-import { Loader2, Wand2 } from 'lucide-react';
+import { Check, Copy, Loader2, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import * as Dialog from '@radix-ui/react-dialog';
 import { toast } from 'sonner';
 import { CodeBlock } from './code-block';
+
+function removeMarkdownCodeFence(code: string) {
+    const trimmedCode = code.trim();
+    const fencedCodeMatch = trimmedCode.match(
+        /^```(?:typescript|ts)?\s*([\s\S]*?)\s*```$/i
+    );
+
+    if (fencedCodeMatch) {
+        return fencedCodeMatch[1].trim();
+    }
+
+    return trimmedCode
+        .replace(/^```(?:typescript|ts)?\s*/i, '')
+        .replace(/\s*```$/i, '')
+        .trim();
+}
 
 export function WebhookList() {
     const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -16,12 +32,13 @@ export function WebhookList() {
     const [generatedHandlerCode, setGeneratedHandlerCode] = useState<
         string | null
     >(null);
+    const [hasCopiedCode, setHasCopiedCode] = useState(false);
 
     const { data, hasNextPage, fetchNextPage, isFetchingNextPage } =
         useSuspenseInfiniteQuery({
             queryKey: ['webhooks'],
             queryFn: async ({ pageParam }) => {
-                const url = new URL('http://localhost:3333/api/v1/webhooks');
+                const url = new URL('/api/v1/webhooks', window.location.origin);
 
                 if (pageParam) {
                     url.searchParams.set('cursor', pageParam);
@@ -77,13 +94,24 @@ export function WebhookList() {
 
     const handleGenerateHandler = async () => {
         setGeneratedHandlerCode(null);
+        setHasCopiedCode(false);
 
-        const response = fetch('http://localhost:3333/api/v1/generate', {
+        const response = fetch('/api/v1/generate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ webhookIds: checkedWebhookIds }),
+        }).then(async (response) => {
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data?.message || 'Nao foi possivel gerar o codigo'
+                );
+            }
+
+            return data;
         });
 
         type GenerateReponse = {
@@ -92,13 +120,25 @@ export function WebhookList() {
 
         toast.promise(response, {
             loading: 'Estamos gerando seu código...',
-            success: async (data) => {
-                const d: GenerateReponse = await data.json();
-                setGeneratedHandlerCode(d.code);
+            success: (data: GenerateReponse) => {
+                setGeneratedHandlerCode(removeMarkdownCodeFence(data.code));
                 return `Código pronto`;
             },
             error: 'Error ao gerar código',
         });
+    };
+
+    const handleCopyGeneratedCode = async () => {
+        if (!generatedHandlerCode) {
+            return;
+        }
+
+        await navigator.clipboard.writeText(generatedHandlerCode);
+        setHasCopiedCode(true);
+
+        window.setTimeout(() => {
+            setHasCopiedCode(false);
+        }, 2000);
     };
 
     const hasAnyWebhookChecked = checkedWebhookIds.length > 0;
@@ -119,7 +159,6 @@ export function WebhookList() {
                         'transition-colors duration-500 cursor-pointer rounded-sm '
                     )}
                 >
-                    <Wand2 className="size-4" />
                     <span>Gerar handler</span>
                 </button>
                 <div className="space-y-1 p-2">
@@ -147,14 +186,56 @@ export function WebhookList() {
             </div>
 
             {!!generatedHandlerCode && (
-                <Dialog.Root defaultOpen>
-                    <Dialog.Overlay className="bg-white-600/50 fixed inset-0 z-10" />
-                    <Dialog.Content className="flex items-center justify-center fixed left-1/2 right-1/2 top-1/2 max-h-[85vh] w-[95vw] -translate-x-1/2 -translate-y-1/2 max-w-[500px] z-20">
-                        <div className="bg/white min-w-fit overflow-y-auto max-h-[600px] rounded-md border border-white-400">
+                <Dialog.Root
+                    open
+                    onOpenChange={(open) => {
+                        if (!open) {
+                            setGeneratedHandlerCode(null);
+                        }
+                    }}
+                >
+                    <Dialog.Overlay className="fixed inset-0 z-10 bg-white-900/30 backdrop-blur-sm" />
+                    <Dialog.Content className="fixed left-1/2 top-1/2 z-20 flex max-h-[90vh] w-[min(1100px,94vw)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-white-300 bg-white-50 shadow-2xl shadow-white-900/20">
+                        <div className="border-b border-white-300 bg-white-100 px-5 py-4">
+                            <div className="flex items-start justify-between gap-4">
+                                <div className="flex items-start gap-3">
+                                    <div>
+                                        <Dialog.Title className="text-base font-semibold text-white-900">
+                                            Handler gerado
+                                        </Dialog.Title>
+                                        <Dialog.Description className="mt-1 text-sm text-white-600">
+                                            Codigo TypeScript pronto para copiar e adaptar ao seu webhook.
+                                        </Dialog.Description>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={handleCopyGeneratedCode}
+                                        className="inline-flex items-center gap-2 rounded-lg border border-white-300 bg-white-50 px-3 py-2 text-sm font-medium text-white-800 transition-colors hover:bg-white-200"
+                                    >
+                                        {hasCopiedCode ? (
+                                            <Check className="size-4 text-emerald-600" />
+                                        ) : (
+                                            <Copy className="size-4" />
+                                        )}
+                                        {hasCopiedCode ? 'Copiado' : 'Copiar'}
+                                    </button>
+
+                                    <Dialog.Close className="inline-flex size-9 items-center justify-center rounded-lg border border-white-300 bg-white-50 text-white-700 transition-colors hover:bg-white-200 hover:text-white-900">
+                                        <X className="size-4" />
+                                    </Dialog.Close>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="min-h-0 flex-1 bg-white-50 p-4">
                             <CodeBlock
                                 language="typescript"
                                 code={generatedHandlerCode}
-                            ></CodeBlock>
+                                className="h-full max-h-[68vh] rounded-xl border-white-300 bg-white [&_code]:bg-white! [&_pre]:min-h-full [&_pre]:bg-white! [&_pre]:p-5 [&_pre]:text-[13px] [&_pre]:leading-6"
+                            />
                         </div>
                     </Dialog.Content>
                 </Dialog.Root>

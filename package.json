@@ -1,11 +1,19 @@
 {
-    "name": "gem_hook",
-    "version": "1.0.0",
-    "description": "",
-    "private": "true",
-    "workspaces": [  
-        "api",
-        "web"
-    ],
-    "packageManager": "pnpm@10.19.0"
+  "name": "gem_hook",
+  "version": "1.0.0",
+  "description": "",
+  "private": "true",
+  "scripts": {
+    "dev": "pnpm --parallel -r dev",
+    "dev:api": "pnpm --dir api dev",
+    "dev:web": "pnpm --dir web dev",
+    "build": "pnpm --dir api build && pnpm --dir web build",
+    "build:web": "pnpm --dir web build",
+    "start": "pnpm --dir api start"
+  },
+  "workspaces": [
+    "api",
+    "web"
+  ],
+  "packageManager": "pnpm@10.19.0"
 }

@@ -1,5 +1,4 @@
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { webhookSchema } from '@/schemas/zod/webhooks';
 import { z } from 'zod';
 
 export const deleteWebhook: FastifyPluginAsyncZod = async (app) => {

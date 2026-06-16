@@ -1,5 +1,5 @@
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { webhookSchema } from '@/schemas/zod/webhooks';
+import { webhookSchema } from '../schemas/zod/webhooks';
 import { z } from 'zod';
 
 export const getWebhook: FastifyPluginAsyncZod = async (app) => {

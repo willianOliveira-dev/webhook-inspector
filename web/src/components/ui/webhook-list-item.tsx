@@ -20,12 +20,11 @@ export function WebhookListItem({
     onWebhookChecked,
     isWebhookChecked,
 }: WebhookListItemProps) {
-    // to DELETE or CREATE
     const queryClient = useQueryClient();
 
     const { mutate: deleteWebhook } = useMutation({
         mutationFn: async (id: string) => {
-            await fetch(`http://localhost:3333/api/v1/webhooks/${id}`, {
+            await fetch(`/api/v1/webhooks/${id}`, {
                 method: 'DELETE',
             });
         },

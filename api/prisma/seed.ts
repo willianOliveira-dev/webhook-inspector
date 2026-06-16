@@ -218,15 +218,15 @@ class TwilioWebhookSimulator {
   static eventConfigs = [
     { name: 'message.received', weight: 40, generatePayload: () => ({
       MessageSid: `SM${faker.string.alphanumeric(32)}`,
-      From: faker.phone.number('+55119########'),
-      To: faker.phone.number('+55119########'),
+      From: `+55119${faker.string.numeric(8)}`,
+      To: `+55119${faker.string.numeric(8)}`,
       Body: faker.lorem.sentence(),
       NumMedia: '0',
     })},
     { name: 'call.completed', weight: 25, generatePayload: () => ({
       CallSid: `CA${faker.string.alphanumeric(32)}`,
-      From: faker.phone.number('+55119########'),
-      To: faker.phone.number('+55119########'),
+      From: `+55119${faker.string.numeric(8)}`,
+      To: `+55119${faker.string.numeric(8)}`,
       CallStatus: 'completed',
       CallDuration: faker.number.int({ min: 10, max: 600 }),
     })},
@@ -269,6 +269,11 @@ async function generateWebhooks(system: keyof typeof SYSTEMS, count: number = 60
   const Simulator = SYSTEMS[system];
   const webhooksData = Array.from({ length: count }).map(() => {
     const webhook = Simulator.generate();
+    const contentType =
+      'content-type' in webhook.headers
+        ? webhook.headers['content-type']
+        : 'application/json';
+
     return {
       id: uuidv7(),
       method: webhook.method,
@@ -279,7 +284,7 @@ async function generateWebhooks(system: keyof typeof SYSTEMS, count: number = 60
         { weight: 5, value: 400 },
         { weight: 5, value: 500 },
       ]),
-      contentType: webhook.headers['content-type'] || 'application/json',
+      contentType,
       contentLength: Buffer.byteLength(webhook.body, 'utf8'),
       queryParams: {},
       headers: webhook.headers,

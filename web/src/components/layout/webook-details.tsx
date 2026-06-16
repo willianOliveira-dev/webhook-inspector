@@ -13,9 +13,7 @@ export function WebHookDetails({ id }: WebhookDetailsProps) {
     const { data } = useSuspenseQuery({
         queryKey: ['webhook', id],
         queryFn: async () => {
-            const response = await fetch(
-                `http://localhost:3333/api/v1/webhooks/${id}`
-            );
+            const response = await fetch(`/api/v1/webhooks/${id}`);
 
             const data = await response.json();
 
