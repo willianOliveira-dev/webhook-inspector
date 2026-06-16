@@ -9,6 +9,22 @@ export function Sidebar() {
             ? '/capture'
             : `${window.location.origin}/capture`;
 
+    async function copyCaptureUrl() {
+        if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(captureUrl);
+            return;
+        }
+
+        const textarea = document.createElement('textarea');
+        textarea.value = captureUrl;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+    }
+
     return (
         <aside className="flex h-screen flex-col bg-white-100">
             <div className="flex items-center justify-between border-b border-white-300 px-4 py-5">
@@ -27,7 +43,10 @@ export function Sidebar() {
                     </span>
 
                     <IconButton
+                        aria-label="Copiar URL de captura"
                         icon={<CopyIcon className="size-4 text-white-700" />}
+                        onClick={() => void copyCaptureUrl()}
+                        title="Copiar URL de captura"
                     />
                 </div>
             </div>
