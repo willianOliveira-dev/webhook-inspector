@@ -24,7 +24,6 @@ FROM deps AS build
 
 COPY . .
 
-RUN pnpm --dir api db:generate
 RUN pnpm run build
 
 FROM base AS production
